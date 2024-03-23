@@ -9,7 +9,7 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 logging.basicConfig(level=logging.INFO)
 #bot = aiogram.Bot(token=config.bot_token.get_secret_value())
-bot = aiogram.Bot(token="1417403958:AAHzkxdVS3AtrKl74w1186iSbzFNCDi5n38")
+bot = aiogram.Bot(token="TOKEN")
 
 dp = aiogram.Dispatcher()
 
