@@ -1,10 +1,12 @@
 import re
-
 import aiogram
 from aiogram.filters.command import Command, CommandStart
 from aiogram.utils.keyboard import InlineKeyboardBuilder
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+import my_token
 
 router = aiogram.Router()
+
 
 global isStartDate
 global isPeriodDur
@@ -12,6 +14,12 @@ global isCycleDur
 isStartDate = False
 isPeriodDur = False
 isCycleDur = False
+
+scheduler = AsyncIOScheduler(timezone='utc')
+bot = aiogram.Bot(token=my_token.my_token)
+async def remind():
+    await bot.send_message(chat_id=954353874, text="Хей🖖 не забудь выбрать свой ужин сегодня")
+
 
 #начало работы бота
 @router.message(Command("start"))
@@ -27,6 +35,7 @@ async def cmd_start(message: aiogram.types.Message):
         parse_mode=aiogram.enums.ParseMode.HTML, reply_markup=builder.as_markup())
     global isStartDate
     isStartDate = True
+    scheduler.add_job(remind(), 'cron', day_of_week='mon-sun', hour=13, minute=50, end_date='3025-10-13')
 
 @router.callback_query(aiogram.F.data == "addstartinfo")
 async def send_random_value(callback: aiogram.types.CallbackQuery):
@@ -87,10 +96,11 @@ async def info_last_day(message: aiogram.types.Message):
             text="Пропустить",
             callback_data="addperiodinfo")
         )
-        format = r'\d\d-\d\d-\d{4}'
+        format = r'\d\d.\d\d.\d{4}'
         if (not re.match(format, message.text)):
             await message.answer("Неверный формат ввода")
         else:
+            #добавление даты в бд
             await message.answer(f"Введите продолжительность периода:\n<i>{"(Только количество дней)"}</i>",
                 parse_mode=aiogram.enums.ParseMode.HTML, reply_markup=builder.as_markup())
             isStartDate = False
@@ -104,6 +114,7 @@ async def info_last_day(message: aiogram.types.Message):
         if (not message.text.isdigit()):
             await message.answer("Неверный формат ввода")
         else:
+            #добавление периода в бд
             isPeriodDur = False
             isCycleDur = True
             await message.answer(f"Введите продолжительность цикла:\n<i>{"(Только количество дней)"}</i>",
@@ -112,5 +123,6 @@ async def info_last_day(message: aiogram.types.Message):
         if(not message.text.isdigit()):
             await message.answer("Неверный формат ввода")
         else:
+            #добавление цикла в бд
             isCycleDur = False
             await message.answer("Данные успешно сохранены\n\nДля помощи введите команду /help")
