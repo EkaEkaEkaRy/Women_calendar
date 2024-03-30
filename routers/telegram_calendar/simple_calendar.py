@@ -41,11 +41,13 @@ class SimpleCalendar(GenericCalendar):
 
         def format_day_string():
             date_to_check = datetime(year, month, day)
+            if date_to_check.date() == datetime.strptime('2024-03-20', '%Y-%m-%d').date():
+                return str(day) + '🌸'
             if self.min_date and date_to_check < self.min_date:
                 return superscript(str(day))
             elif self.max_date and date_to_check > self.max_date:
                 return superscript(str(day))
-            return str(day) + '🌸'
+            return str(day)
 
         def highlight_day():
             day_string = format_day_string()
