@@ -21,10 +21,12 @@ async def adddataperiod(message: aiogram.types):
 
 @router.message(aiogram.F.text.lower() == "начало")
 async def with_puree(message: aiogram.types.Message):
+    #добавление даты в бд
     await message.reply("Данные успешно сохранены")
 
 @router.message(aiogram.F.text.lower() == "конец")
 async def without_puree(message: aiogram.types.Message):
+    # добавление даты в бд
     await message.reply("Данные успешно сохранены")
 
 #получение информации о цикле
