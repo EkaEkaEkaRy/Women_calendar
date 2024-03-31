@@ -5,6 +5,8 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 import my_token
 
+from bd import create_user, add_info_period, add_info_cycle, db_start
+
 router = aiogram.Router()
 
 
@@ -19,8 +21,9 @@ scheduler = AsyncIOScheduler(timezone='utc')
 bot = aiogram.Bot(token=my_token.my_token)
 async def remind():
     await bot.send_message(chat_id=954353874, text="Хей🖖 не забудь выбрать свой ужин сегодня")
-
-
+#подключение к базе данных (или ее создание, если не существует)
+async def on_startup(_):
+    await db_start()
 #начало работы бота
 @router.message(Command("start"))
 async def cmd_start(message: aiogram.types.Message):
@@ -29,7 +32,9 @@ async def cmd_start(message: aiogram.types.Message):
         text="Пропустить",
         callback_data="addstartinfo")
     )
-
+    await create_user(user_id=message.from_user.id)
+    global user_id # я не уверена что так правильно!
+    user_id = message.from_user.id
     await message.answer("Этот календарь помогает: \n🌸 определить регулярность цикла\n🌸 прогнозировать дату ожидаемых месячных и дни овуляции\n🌸 помочь в диагностике при нарушениях менструального цикла\n\nДля начала работы необходимо ответить на несколько вопросов\nДля помощи введите команду /help")
     await message.answer(f"Введите дату начала последней менструации:\n<i>{"(В формате дд.мм.гггг)"}</i>",
         parse_mode=aiogram.enums.ParseMode.HTML, reply_markup=builder.as_markup())
@@ -119,6 +124,7 @@ async def info_last_day(message: aiogram.types.Message):
             isCycleDur = True
             await message.answer(f"Введите продолжительность цикла:\n<i>{"(Только количество дней)"}</i>",
                 parse_mode=aiogram.enums.ParseMode.HTML, reply_markup=builder.as_markup())
+            await add_info_period(user_id=user_id, period_length='')
     elif (isCycleDur):
         if(not message.text.isdigit()):
             await message.answer("Неверный формат ввода")
@@ -126,3 +132,4 @@ async def info_last_day(message: aiogram.types.Message):
             #добавление цикла в бд
             isCycleDur = False
             await message.answer("Данные успешно сохранены\n\nДля помощи введите команду /help")
+            await add_info_cycle(user_id=user_id, cycle_length='')
