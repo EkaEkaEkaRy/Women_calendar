@@ -5,7 +5,7 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 #from apscheduler.schedulers.asyncio import AsyncIOScheduler
 import my_token
 
-from .bd import create_user, add_info_period, add_info_cycle, db_start
+from .bd import create_user_users, add_info_period, add_info_cycle, db_start
 
 router = aiogram.Router()
 
@@ -36,7 +36,7 @@ async def cmd_start(message: aiogram.types.Message):
         text="Пропустить",
         callback_data="addstartinfo")
     )
-    await create_user(message.from_user.id)
+    await create_user_users(message.from_user.id)
     await message.answer("Этот календарь помогает: \n🌸 определить регулярность цикла\n🌸 прогнозировать дату ожидаемых месячных и дни овуляции\n🌸 помочь в диагностике при нарушениях менструального цикла\n\nДля начала работы необходимо ответить на несколько вопросов\nДля помощи введите команду /help")
     await message.answer(f"Введите дату начала последней менструации:\n<i>{'(В формате дд.мм.гггг)'}</i>",
         parse_mode=aiogram.enums.ParseMode.HTML, reply_markup=builder.as_markup())

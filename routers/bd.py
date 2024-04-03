@@ -13,7 +13,7 @@ async def db_start():  # Создание таблицы с Id пользова�
     db.close()
 
 
-async def create_user(user_id):  # добавление в таблицу нового пользователя (только Id)
+async def create_user_users(user_id):  # добавление в таблицу нового пользователя (только Id)
     db = sq.connect('bot.db')
     cur = db.cursor()
     cur.execute("""CREATE TABLE IF NOT EXISTS users(
@@ -27,8 +27,6 @@ async def create_user(user_id):  # добавление в таблицу нов
         cur.execute("INSERT INTO users (user_id, period_length, cycle_length) VALUES (?, ?, ?)", (user_id, '', ''))
         db.commit()
         db.close()
-        if cur:
-            print("baza sozdana")
 
 
 async def add_info_period(user_id, period_length):  # добавление в таблицу длины периода
@@ -53,5 +51,59 @@ async def add_info_cycle(user_id, cycle_length):  # добавление в та
                 period_length INTEGER, 
                 cycle_length INTEGER)""")
     cur.execute("UPDATE users SET cycle_length = {} WHERE user_id = {}".format(cycle_length, user_id))
+    db.commit()
+    db.close()
+
+
+''''''''''''''''''''''''''''''''''''
+
+
+async def cycle_start():  # Создание таблицы с датами циклов
+    db = sq.connect('bot.db')
+    cur = db.cursor()
+    cur.execute("""CREATE TABLE IF NOT EXISTS cycles(
+        user_id TEXT PRIMARY KEY, 
+        start_date TEXT, 
+        end_date TEXT)""")
+    db.commit()
+    db.close()
+
+
+async def create_user_cycles(user_id):  # добавление в таблицу cycles нового пользователя (только Id)
+    db = sq.connect('bot.db')
+    cur = db.cursor()
+    cur.execute("""CREATE TABLE IF NOT EXISTS cycles(
+        user_id TEXT PRIMARY KEY, 
+        start_date TEXT, 
+        end_date TEXT)""")
+    user = cur.execute("SELECT 1 "
+                       "FROM cycles "
+                       "WHERE user_id = {key}".format(key=user_id)).fetchone()
+    if not user:
+        cur.execute("INSERT INTO cycles (user_id, start_date, end_date) VALUES (?, ?, ?)", (user_id, '', ''))
+        db.commit()
+        db.close()
+
+
+async def start_date(user_id, start):  # добавление даты начала цикла
+    db = sq.connect('bot.db')
+    cur = db.cursor()
+    cur.execute("""CREATE TABLE IF NOT EXISTS cycles(
+        user_id TEXT PRIMARY KEY, 
+        start_date TEXT, 
+        end_date TEXT)""")
+    cur.execute("UPDATE cycles SET start_date = {} WHERE user_id = {}".format(start, user_id))
+    db.commit()
+    db.close()
+
+
+async def end_date(user_id, start, end):  # добвление даты конца цикла
+    db = sq.connect('bot.db')
+    cur = db.cursor()
+    cur.execute("""CREATE TABLE IF NOT EXISTS cycles(
+        user_id TEXT PRIMARY KEY, 
+        start_date TEXT, 
+        end_date TEXT)""")
+    cur.execute("UPDATE cycles SET end_date = {} WHERE user_id = {} AND start_date = {}".format(end, user_id, start))
     db.commit()
     db.close()
