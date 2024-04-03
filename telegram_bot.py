@@ -2,9 +2,9 @@ import asyncio
 import logging
 import aiogram
 import my_token
-from routers import help,start_end_info, post_info, calendar, bd
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
-#from config_reader import config
+from routers import help,start_end_info, post_info, calendar
+# from apscheduler.schedulers.asyncio import AsyncIOScheduler
+# from config_reader import config
 
 
 async def main():
