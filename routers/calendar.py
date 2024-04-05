@@ -9,6 +9,8 @@ from aiogram.types import Message, ReplyKeyboardMarkup, KeyboardButton, Callback
 from datetime import datetime
 
 router = aiogram.Router()
+global date_period
+date_period = None
 
 @router.message(Command("calendar"))
 async def calendar(message: aiogram.types.Message):
@@ -38,9 +40,9 @@ async def process_simple_calendar(callback_query: CallbackQuery, callback_data: 
             input_field_placeholder="Отметьте начало или конец периода"
         )
         await callback_query.message.answer("Начало менструации?", reply_markup=keyboard)
-        await callback_query.message.answer(
-            f'You selected {date.strftime("%d.%m.%Y")}',
-        )
+        global date_period
+        date_period = date.strftime("%d.%m.%Y")
+        print(date_period)
 
 
 
