@@ -63,8 +63,8 @@ async def cycle_start():  # Создание таблицы с датами ци
     cur = db.cursor()
     cur.execute(f"""CREATE TABLE IF NOT EXISTS cycles(
         user_id TEXT PRIMARY KEY, 
-        start_date STRING, 
-        end_date STRING)""")
+        start_date TEXT, 
+        end_date TEXT)""")
     db.commit()
     db.close()
 
@@ -75,8 +75,8 @@ async def create_user_cycles(user_id):  # добавление в таблицу
     user = user_id
     cur.execute("""CREATE TABLE IF NOT EXISTS cycles(
         user_id TEXT PRIMARY KEY, 
-        start_date STRING, 
-        end_date STRING)""")
+        start_date TEXT, 
+        end_date TEXT)""")
     user = cur.execute("SELECT 1 "
                        "FROM cycles "
                        "WHERE user_id = {key}".format(key=user_id)).fetchone()
@@ -91,8 +91,8 @@ async def start_date(user_id, start):  # добавление даты нача�
     cur = db.cursor()
     cur.execute(f"""CREATE TABLE IF NOT EXISTS cycles(
         user_id TEXT PRIMARY KEY, 
-        start_date STRING, 
-        end_date STRING)""")
+        start_date TEXT, 
+        end_date TEXT)""")
     cur.execute("UPDATE cycles SET start_date = {} WHERE user_id = {}".format(start, user_id))
     db.commit()
     db.close()
@@ -103,8 +103,8 @@ async def end_date(user_id, start, end):  # добвление даты конц
     cur = db.cursor()
     cur.execute(f"""CREATE TABLE IF NOT EXISTS cycles(
         user_id TEXT PRIMARY KEY, 
-        start_date STRING, 
-        end_date STRING)""")
+        start_date TEXT, 
+        end_date TEXT)""")
     cur.execute("UPDATE cycles SET end_date = {} WHERE user_id = {} AND start_date = {}".format(end, user_id, start))
     db.commit()
     db.close()

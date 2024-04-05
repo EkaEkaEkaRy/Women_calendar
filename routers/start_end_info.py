@@ -81,7 +81,8 @@ async def with_puree(message: aiogram.types.Message):
         print(date.today().strftime("%d.%m.%Y"))
         # добавление даты в бд
         current_date_time = str(date.today().strftime("%Y-%m-%d"))
-        await start_date(user_id=message.from_user.id, start=current_date_time)
+        lala = str("ааааа ")
+        await start_date(user_id=message.from_user.id, start=lala)
         await message.reply("Данные успешно сохранены")
         global starting
         starting = current_date_time
