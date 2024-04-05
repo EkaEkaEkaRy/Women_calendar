@@ -42,6 +42,7 @@ class SimpleCalendar(GenericCalendar):
         def format_day_string():
             date_to_check = datetime(year, month, day)
             #берем даты из бд начала и конца периода
+            #если конца нет то конечная дата это дата начала + длина периода
             if date_to_check.date() >= datetime.strptime('15.03.2024', '%d.%m.%Y').date() and date_to_check.date() <= datetime.strptime('20.03.2024', '%d.%m.%Y').date():
                 return str(day) + '🌸'
             """
