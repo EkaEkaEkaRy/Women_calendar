@@ -61,7 +61,7 @@ async def add_info_cycle(user_id, cycle_length):  # добавление в та
 async def cycle_start():  # Создание таблицы с датами циклов
     db = sq.connect('bot.db')
     cur = db.cursor()
-    cur.execute("""CREATE TABLE IF NOT EXISTS cycles(
+    cur.execute(f"""CREATE TABLE IF NOT EXISTS cycles(
         user_id TEXT PRIMARY KEY, 
         start_date TEXT, 
         end_date TEXT)""")
@@ -72,6 +72,7 @@ async def cycle_start():  # Создание таблицы с датами ци
 async def create_user_cycles(user_id):  # добавление в таблицу cycles нового пользователя (только Id)
     db = sq.connect('bot.db')
     cur = db.cursor()
+    user = user_id
     cur.execute("""CREATE TABLE IF NOT EXISTS cycles(
         user_id TEXT PRIMARY KEY, 
         start_date TEXT, 
@@ -88,7 +89,7 @@ async def create_user_cycles(user_id):  # добавление в таблицу
 async def start_date(user_id, start):  # добавление даты начала цикла
     db = sq.connect('bot.db')
     cur = db.cursor()
-    cur.execute("""CREATE TABLE IF NOT EXISTS cycles(
+    cur.execute(f"""CREATE TABLE IF NOT EXISTS cycles(
         user_id TEXT PRIMARY KEY, 
         start_date TEXT, 
         end_date TEXT)""")
@@ -100,7 +101,7 @@ async def start_date(user_id, start):  # добавление даты нача�
 async def end_date(user_id, start, end):  # добвление даты конца цикла
     db = sq.connect('bot.db')
     cur = db.cursor()
-    cur.execute("""CREATE TABLE IF NOT EXISTS cycles(
+    cur.execute(f"""CREATE TABLE IF NOT EXISTS cycles(
         user_id TEXT PRIMARY KEY, 
         start_date TEXT, 
         end_date TEXT)""")

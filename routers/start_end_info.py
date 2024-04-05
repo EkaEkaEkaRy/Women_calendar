@@ -2,6 +2,7 @@ import aiogram
 from aiogram.filters.command import Command, CommandStart
 from .bd import create_user_cycles, start_date, end_date, cycle_start
 from datetime import date
+from datetime import datetime
 #from .calendar import date_period
 
 from routers.telegram_calendar import simple_calendar
@@ -72,17 +73,18 @@ async def with_puree(message: aiogram.types.Message):
     # если дата выбрана на календаре
     if date_period_from_calendar != None:
         # добавление даты из date_period_from_calendar в бд
-        #date_period_from_calendar это переменная в которой хранится дата выбранная в календаре
+        # date_period_from_calendar это переменная в которой хранится дата выбранная в календаре
         print(date_period_from_calendar)
         date_period_from_calendar = None
     # иначе дата берется сегодняшняя
     else:
         print(date.today().strftime("%d.%m.%Y"))
         # добавление даты в бд
-        await start_date(user_id=message.from_user.id, start=date.today())
+        current_date_time = date.today().strftime("%Y-%m-%d")
+        await start_date(user_id=message.from_user.id, start=current_date_time)
         await message.reply("Данные успешно сохранены")
         global starting
-        starting = date.today()
+        starting = current_date_time
 
 @router.message(aiogram.F.text.lower() == "конец")
 async def without_puree(message: aiogram.types.Message):
