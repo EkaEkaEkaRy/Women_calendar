@@ -81,7 +81,7 @@ async def create_user_cycles(user_id):  # добавление в таблицу
                        "FROM cycles "
                        "WHERE user_id = {key}".format(key=user_id)).fetchone()
     if not user:
-        cur.execute("INSERT INTO cycles (user_id, start_date, end_date) VALUES (?, ?, ?)", (user_id, '', ''))
+        cur.execute(f"INSERT INTO cycles (user_id, start_date, end_date) VALUES (?, ?, ?)", (user_id, ' ', ' '))
         db.commit()
         db.close()
 
@@ -93,7 +93,7 @@ async def start_date(user_id, start):  # добавление даты нача�
         user_id TEXT PRIMARY KEY, 
         start_date TEXT, 
         end_date TEXT)""")
-    cur.execute("UPDATE cycles SET start_date = {} WHERE user_id = {}".format(start, user_id))
+    cur.execute("UPDATE cycles SET start_date = ? WHERE user_id = ?", (f"{start}", user_id))
     db.commit()
     db.close()
 
@@ -105,6 +105,34 @@ async def end_date(user_id, start, end):  # добвление даты конц
         user_id TEXT PRIMARY KEY, 
         start_date TEXT, 
         end_date TEXT)""")
-    cur.execute("UPDATE cycles SET end_date = {} WHERE user_id = {} AND start_date = {}".format(end, user_id, start))
+    cur.execute("UPDATE cycles SET end_date = ? WHERE user_id = ? AND start_date = ?", (f"{end}" , user_id, f"{start}"))
+    db.commit()
+    db.close()
+
+async def sel1():  # добвление даты конца цикла
+    db = sq.connect('bot.db')
+    cur = db.cursor()
+    cur.execute(f"""SELECT * FROM cycles""")
+    users = cur.fetchall()
+    for user in users:
+        print(user)
+    db.commit()
+    db.close()
+
+
+async def sel2():  # добвление даты конца цикла
+    db = sq.connect('bot.db')
+    cur = db.cursor()
+    cur.execute(f"""SELECT * FROM users""")
+    users = cur.fetchall()
+    for user in users:
+        print(user)
+    db.commit()
+    db.close()
+
+async def delet(user_id):  # добвление даты конца цикла
+    db = sq.connect('bot.db')
+    cur = db.cursor()
+    cur.execute(f"DELETE FROM cycles WHERE user_id = {user_id}")
     db.commit()
     db.close()
