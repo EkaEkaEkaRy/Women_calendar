@@ -4,8 +4,9 @@ from aiogram.filters.command import Command, CommandStart
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 #from apscheduler.schedulers.asyncio import AsyncIOScheduler
 import my_token
+from datetime import datetime, timedelta
 
-from .bd import create_user_users, add_info_period, add_info_cycle, db_start
+from .bd import create_user_users, add_info_period, add_info_cycle, db_start, start_date, end_date
 
 router = aiogram.Router()
 
@@ -113,6 +114,9 @@ async def info_last_day(message: aiogram.types.Message):
             await message.answer("Неверный формат ввода")
         else:
             #добавление даты в бд
+            st_date = datetime.strptime(message.text, '%d.%m.%Y')
+            await start_date(user_id=message.from_user.id, start=st_date.date().strftime("%Y-%m-%d"))
+            await end_date(user_id=message.from_user.id, start=st_date.date().strftime("%Y-%m-%d"), end=(st_date + timedelta(days=5)).date().strftime("%Y-%m-%d"))
             await message.answer(f"Введите продолжительность периода:\n<i>{'(Только количество дней)'}</i>",
                 parse_mode=aiogram.enums.ParseMode.HTML, reply_markup=builder.as_markup())
             isStartDate = False
