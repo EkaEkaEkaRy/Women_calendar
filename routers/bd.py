@@ -115,9 +115,7 @@ async def end_date(user_id, end):  # добвление даты конца ци
         user_id TEXT, 
         start_date TEXT, 
         end_date TEXT)""")
-    latest_start = cur.execute("SELECT start_date "
-                               "FROM cycles"
-                               "ORDER BY start_date DESC").fetchone()
+    latest_start = cur.execute("""SELECT start_date FROM cycles ORDER BY start_date DESC""").fetchone()[0]
     cur.execute("UPDATE cycles SET end_date = ? WHERE user_id = ? AND start_date = ?", (f"{end}", user_id, f"{latest_start}"))
     db.commit()
     db.close()

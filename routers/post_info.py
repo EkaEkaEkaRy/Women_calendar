@@ -86,6 +86,12 @@ async def send_random_value(callback: aiogram.types.CallbackQuery):
 # ввод информации о цикле
 @router.message(Command("addinfo"))
 async def addinfo(message: aiogram.types.Message):
+    global isStartDate
+    global isPeriodDur
+    global isCycleDur
+    isStartDate = False
+    isPeriodDur = False
+    isCycleDur = False
     builder = InlineKeyboardBuilder()
     builder.add(aiogram.types.InlineKeyboardButton(
         text="Пропустить",
@@ -93,7 +99,6 @@ async def addinfo(message: aiogram.types.Message):
     )
     await message.answer(f"Введите продолжительность периода:\n<i>{'(Только количество дней)'}</i>",
         parse_mode=aiogram.enums.ParseMode.HTML, reply_markup=builder.as_markup())
-    global isPeriodDur
     isPeriodDur = True
 
 
