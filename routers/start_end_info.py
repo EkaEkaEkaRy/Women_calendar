@@ -116,10 +116,10 @@ async def info(message: aiogram.types):
         resize_keyboard=True,
         input_field_placeholder="Отметьте начало или конец периода"
     )
-    next_cycle = await cycle_info(user_id=message.from_user.id)
-    fertile = await fertile_days(user_id=message.from_user.id)
+    next_cycle, count_days = await cycle_info(user_id=message.from_user.id)
+    next_days_start, next_days_end, count_dayss = await fertile_days(user_id=message.from_user.id)
     #days = next_cycle - date.today()
-    await message.answer(f"Следующий цикл начнется <b>{next_cycle}</b>\n"
-                         f"Фертильные дни с <b>{fertile[0]}</b> по <b>{fertile[1]}</b>",
+    await message.answer(f"Следующий цикл начнется через: <b>{count_days}</b> (Дата начала: <b>{next_cycle}</b>)\n\n"
+                         f"Фертильные дни начнутся через: <b>{count_dayss}</b> (с {next_days_start} по {next_days_end})",
                          reply_markup=keyboard, parse_mode=aiogram.enums.ParseMode.HTML)
 
