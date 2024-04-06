@@ -115,8 +115,8 @@ async def info_last_day(message: aiogram.types.Message):
         else:
             #добавление даты в бд
             st_date = datetime.strptime(message.text, '%d.%m.%Y')
-            await start_date(user_id=message.from_user.id, start=st_date.date().strftime("%Y-%m-%d"))
-            await end_date(user_id=message.from_user.id, start=st_date.date().strftime("%Y-%m-%d"), end=(st_date + timedelta(days=5)).date().strftime("%Y-%m-%d"))
+            await start_date(user_id=message.from_user.id, start=st_date.date())
+            await end_date(user_id=message.from_user.id, end=(st_date + timedelta(days=5)).date().strftime("%Y-%m-%d"))
             await message.answer(f"Введите продолжительность периода:\n<i>{'(Только количество дней)'}</i>",
                 parse_mode=aiogram.enums.ParseMode.HTML, reply_markup=builder.as_markup())
             isStartDate = False

@@ -26,7 +26,7 @@ async def create_user_users(user_id):  # добавление в таблицу 
                        "FROM users "
                        "WHERE user_id = {key}".format(key=user_id)).fetchone()
     if not user:
-        cur.execute("INSERT INTO users (user_id, period_length, cycle_length) VALUES (?, ?, ?)", (user_id, '', ''))
+        cur.execute("INSERT INTO users (user_id, period_length, cycle_length) VALUES (?, ?, ?)", (user_id, 6, 30))
         db.commit()
         db.close()
 
@@ -115,7 +115,10 @@ async def end_date(user_id, end):  # добвление даты конца ци
         user_id TEXT, 
         start_date TEXT, 
         end_date TEXT)""")
-    cur.execute("UPDATE cycles SET end_date = ? WHERE user_id = ?", (f"{end}", user_id))
+    latest_start = cur.execute("SELECT start_date "
+                               "FROM cycles"
+                               "ORDER BY start_date DESC").fetchone()
+    cur.execute("UPDATE cycles SET end_date = ? WHERE user_id = ? AND start_date = ?", (f"{end}", user_id, f"{latest_start}"))
     db.commit()
     db.close()
 
@@ -176,8 +179,13 @@ async def fertile_days(user_id):
     cycles = cur.execute("SELECT start_date "
                                    "FROM cycles "
                                    "WHERE user_id = ?", (user_id,)).fetchone()
-    number_day = cycle_length - 16
+    days = []
+    number_day_start = cycle_length - 16
+    number_day_end = cycle_length - 12
     start_days = datetime.strptime(cycles[len(cycles)-1], "%Y-%m-%d")
-    next_days = start_days + timedelta(days=number_day)
-    return next_days
+    next_days_start = start_days + timedelta(days=number_day_start)
+    next_days_end = start_days + timedelta(days=number_day_end)
+    days.append(next_days_start)
+    days.append(next_days_end)
+    return days
     db.close()

@@ -98,7 +98,7 @@ async def without_puree(message: aiogram.types.Message):
     else:
         print(date.today().strftime("%d.%m.%Y"))
         # добавление даты в бд
-        await end_date(user_id=message.from_user.id, end=datetime.datetime.strptime(date.today(), "%d.%m.%Y"))
+        await end_date(user_id=message.from_user.id, end=date.today())
         await message.reply("Данные успешно сохранены")
 
 
@@ -119,5 +119,7 @@ async def info(message: aiogram.types):
     next_cycle = await cycle_info(user_id=message.from_user.id)
     fertile = await fertile_days(user_id=message.from_user.id)
     #days = next_cycle - date.today()
-    await message.answer(f"Следующий цикл начнется <b>{next_cycle}</b>\nФертильные дни начинаются <b>{fertile}</b>", reply_markup=keyboard, parse_mode=aiogram.enums.ParseMode.HTML)
+    await message.answer(f"Следующий цикл начнется <b>{next_cycle}</b>\n"
+                         f"Фертильные дни с <b>{fertile[0]}</b> по <b>{fertile[1]}</b>",
+                         reply_markup=keyboard, parse_mode=aiogram.enums.ParseMode.HTML)
 
