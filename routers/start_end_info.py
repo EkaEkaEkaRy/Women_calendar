@@ -1,6 +1,6 @@
 import aiogram
 from aiogram.filters.command import Command, CommandStart
-from .bd import create_user_cycles, start_date, end_date, cycle_start
+from .bd import start_date, end_date, cycle_start, cycle_info, fertile_days
 from datetime import date
 from datetime import datetime
 #from .calendar import date_period
@@ -38,7 +38,7 @@ async def adddataperiod(message: aiogram.types):
         resize_keyboard=True,
         input_field_placeholder="Отметьте начало или конец периода"
     )
-    await create_user_cycles(message.from_user.id)
+    #await create_user_cycles(message.from_user.id)
     await message.answer("Начало менструации?", reply_markup=keyboard)
 
 #нажатие кнопкок на календаре
@@ -80,11 +80,12 @@ async def with_puree(message: aiogram.types.Message):
     else:
         print(date.today().strftime("%d.%m.%Y"))
         # добавление даты в бд
-        current_date_time = date.today().strftime("%Y-%m-%d")
-        await start_date(user_id=message.from_user.id, start=current_date_time)
+        #datt = str(date.today().strftime("%Y.%m.%d"))
+        #current_date_time = datetime.strptime(str(date.today()), "%Y.%m.%d")
+        await start_date(user_id=message.from_user.id, start=date.today())
         await message.reply("Данные успешно сохранены")
-        global starting
-        starting = current_date_time
+        '''global starting
+        starting = current_date_time'''
 
 @router.message(aiogram.F.text.lower() == "конец")
 async def without_puree(message: aiogram.types.Message):
@@ -97,7 +98,7 @@ async def without_puree(message: aiogram.types.Message):
     else:
         print(date.today().strftime("%d.%m.%Y"))
         # добавление даты в бд
-        await end_date(user_id=message.from_user.id, start=starting, end=date.today().strftime("%Y-%m-%d"))
+        await end_date(user_id=message.from_user.id, end=datetime.datetime.strptime(date.today(), "%d.%m.%Y"))
         await message.reply("Данные успешно сохранены")
 
 
@@ -115,5 +116,8 @@ async def info(message: aiogram.types):
         resize_keyboard=True,
         input_field_placeholder="Отметьте начало или конец периода"
     )
-    await message.answer(f"Начало цикла через <b>{12}</b>\nФертильные дни через <b>{3}</b>", reply_markup=keyboard, parse_mode=aiogram.enums.ParseMode.HTML)
+    next_cycle = await cycle_info(user_id=message.from_user.id)
+    fertile = await fertile_days(user_id=message.from_user.id)
+    #days = next_cycle - date.today()
+    await message.answer(f"Следующий цикл начнется <b>{next_cycle}</b>\nФертильные дни начинаются <b>{fertile}</b>", reply_markup=keyboard, parse_mode=aiogram.enums.ParseMode.HTML)
 

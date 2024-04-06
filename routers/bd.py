@@ -1,5 +1,7 @@
 import sqlite3 as sq
 import os.path
+from datetime import date
+from datetime import datetime, timedelta
 
 
 async def db_start():  # Создание таблицы с Id пользователя, длиной цикла и периода
@@ -69,7 +71,7 @@ async def cycle_start():  # Создание таблицы с датами ци
     db.close()
 
 
-async def create_user_cycles(user_id):  # добавление в таблицу cycles нового пользователя (только Id)
+'''async def create_user_cycles(user_id):  # добавление в таблицу cycles нового пользователя (только Id)
     db = sq.connect('bot.db')
     cur = db.cursor()
     user = user_id
@@ -83,31 +85,40 @@ async def create_user_cycles(user_id):  # добавление в таблицу
     if not user:
         cur.execute(f"INSERT INTO cycles (user_id, start_date, end_date) VALUES (?, ?, ?)", (user_id, ' ', ' '))
         db.commit()
-        db.close()
+        db.close()'''
 
 
 async def start_date(user_id, start):  # добавление даты начала цикла
     db = sq.connect('bot.db')
     cur = db.cursor()
     cur.execute(f"""CREATE TABLE IF NOT EXISTS cycles(
-        user_id TEXT PRIMARY KEY, 
-        start_date TEXT, 
-        end_date TEXT)""")
-    cur.execute("UPDATE cycles SET start_date = ? WHERE user_id = ?", (f"{start}", user_id))
+            id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+            user_id TEXT, 
+            start_date TEXT, 
+            end_date TEXT)""")
+    days = int(cur.execute("SELECT period_length "
+                       "FROM users "
+                       "WHERE user_id = ?", (user_id, )).fetchone()[0])
+    end = str(start + timedelta(days=days))
+    #ending = datetime.strptime(end, "%Y.%m.%d")
+    cur.execute("INSERT INTO cycles (user_id, start_date, end_date) VALUES (?, ?, ?)",
+                (user_id, f"{start}", f"{end}"))
     db.commit()
     db.close()
 
 
-async def end_date(user_id, start, end):  # добвление даты конца цикла
+async def end_date(user_id, end):  # добвление даты конца цикла
     db = sq.connect('bot.db')
     cur = db.cursor()
     cur.execute(f"""CREATE TABLE IF NOT EXISTS cycles(
-        user_id TEXT PRIMARY KEY, 
+        id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+        user_id TEXT, 
         start_date TEXT, 
         end_date TEXT)""")
-    cur.execute("UPDATE cycles SET end_date = ? WHERE user_id = ? AND start_date = ?", (f"{end}" , user_id, f"{start}"))
+    cur.execute("UPDATE cycles SET end_date = ? WHERE user_id = ?", (f"{end}", user_id))
     db.commit()
     db.close()
+
 
 async def sel1():  # добвление даты конца цикла
     db = sq.connect('bot.db')
@@ -130,9 +141,43 @@ async def sel2():  # добвление даты конца цикла
     db.commit()
     db.close()
 
+
 async def delet(user_id):  # добвление даты конца цикла
     db = sq.connect('bot.db')
     cur = db.cursor()
     cur.execute(f"DELETE FROM cycles WHERE user_id = {user_id}")
     db.commit()
+    db.close()
+
+
+async def cycle_info(user_id):
+    db = sq.connect('bot.db')
+    cur = db.cursor()
+    curr_date = date.today()
+    cycle_length = int(cur.execute("SELECT cycle_length "
+                           "FROM users "
+                           "WHERE user_id = ?", (user_id,)).fetchone()[0])
+    cycles = cur.execute("SELECT start_date "
+                                   "FROM cycles "
+                                   "WHERE user_id = ?", (user_id,)).fetchone()
+    last_cycle = datetime.strptime(cycles[len(cycles)-1], "%Y-%m-%d")
+    next_cycle = last_cycle + timedelta(days=cycle_length)
+    return next_cycle
+    db.close()
+
+
+async def fertile_days(user_id):
+    db = sq.connect('bot.db')
+    cur = db.cursor()
+    curr_date = date.today()
+    cycle_length = int(cur.execute("SELECT cycle_length "
+                           "FROM users "
+                           "WHERE user_id = ?", (user_id,)).fetchone()[0])
+    cycles = cur.execute("SELECT start_date "
+                                   "FROM cycles "
+                                   "WHERE user_id = ?", (user_id,)).fetchone()
+    number_day = cycle_length - 16
+    start_days = datetime.strptime(cycles[len(cycles)-1], "%Y-%m-%d")
+    next_days = start_days + timedelta(days=number_day)
+    return next_days
     db.close()
