@@ -113,8 +113,13 @@ async def end_date(user_id, end):  # добвление даты конца ци
         user_id TEXT, 
         start_date TEXT, 
         end_date TEXT)""")
-    latest_start = cur.execute(f"""SELECT start_date FROM cycles WHERE start_date < '{end}' ORDER BY start_date DESC""").fetchone()[0]
-    cur.execute("UPDATE cycles SET end_date = ? WHERE user_id = ? AND start_date = ?", (f"{end}", user_id, f"{latest_start}"))
+    latest_start = cur.execute(f"""SELECT start_date FROM cycles WHERE start_date <= '{end}' AND user_id = {user_id} ORDER BY start_date DESC""").fetchone()[0]
+    print(latest_start, end.strftime("%Y-%m-%d"))
+    if latest_start == end.strftime("%Y-%m-%d"):
+        print("Yes")
+        cur.execute(f"""DELETE FROM cycles WHERE start_date = '{latest_start}' AND user_id = {user_id};""")
+    else:
+        cur.execute("UPDATE cycles SET end_date = ? WHERE user_id = ? AND start_date = ?", (f"{end}", user_id, f"{latest_start}"))
     db.commit()
     db.close()
 
