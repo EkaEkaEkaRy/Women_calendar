@@ -1,6 +1,7 @@
 import aiogram
 from aiogram.filters.command import Command, CommandStart
 from aiogram.utils.keyboard import InlineKeyboardBuilder
+from .bd import sel1
 
 router = aiogram.Router()
 #помощь по функциям бота
@@ -11,3 +12,7 @@ async def help(message: aiogram.types.Message):
     print(message.from_user.id)
     print(message.from_user.username)
     print(message.text)
+
+@router.message(Command("select"))
+async def select(message: aiogram.types.Message):
+    await sel1()

@@ -72,9 +72,9 @@ async def with_puree(message: aiogram.types.Message):
     global date_period_from_calendar
     # если дата выбрана на календаре
     if date_period_from_calendar != None:
+        await start_date(user_id=message.from_user.id, start=datetime.strptime(date_period_from_calendar, "%d.%m.%Y").date())
         # добавление даты из date_period_from_calendar в бд
         # date_period_from_calendar это переменная в которой хранится дата выбранная в календаре
-        print(date_period_from_calendar)
         date_period_from_calendar = None
     # иначе дата берется сегодняшняя
     else:
@@ -91,8 +91,7 @@ async def with_puree(message: aiogram.types.Message):
 async def without_puree(message: aiogram.types.Message):
     global date_period_from_calendar
     if date_period_from_calendar != None:
-        # добавление даты из date_period в бд
-        # date_period это переменная в которой хранится дата выбранная в календаре
+        await end_date(user_id=message.from_user.id, end=datetime.strptime(date_period_from_calendar, "%d.%m.%Y").date())
         print(date_period_from_calendar)
         date_period_from_calendar = None
     else:
@@ -116,10 +115,10 @@ async def info(message: aiogram.types):
         resize_keyboard=True,
         input_field_placeholder="Отметьте начало или конец периода"
     )
-    next_cycle = await cycle_info(user_id=message.from_user.id)
-    fertile = await fertile_days(user_id=message.from_user.id)
+    next_cycle, count_days = await cycle_info(user_id=message.from_user.id)
+    next_days_start, next_days_end, count_dayss = await fertile_days(user_id=message.from_user.id)
     #days = next_cycle - date.today()
-    await message.answer(f"Следующий цикл начнется <b>{next_cycle}</b>\n"
-                         f"Фертильные дни с <b>{fertile[0]}</b> по <b>{fertile[1]}</b>",
+    await message.answer(f"Следующий цикл начнется через: <b>{count_days}</b> (Дата начала: <b>{next_cycle}</b>)\n\n"
+                         f"Фертильные дни начнутся через: <b>{count_dayss}</b> (с {next_days_start} по {next_days_end})",
                          reply_markup=keyboard, parse_mode=aiogram.enums.ParseMode.HTML)
 

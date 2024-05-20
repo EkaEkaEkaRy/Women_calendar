@@ -7,6 +7,8 @@ from aiogram.types import CallbackQuery
 from .schemas import SimpleCalendarCallback, SimpleCalAct, highlight, superscript
 from .common import GenericCalendar
 
+from ..bd import cycle_info
+
 
 class SimpleCalendar(GenericCalendar):
 
@@ -14,6 +16,7 @@ class SimpleCalendar(GenericCalendar):
 
     async def start_calendar(
         self,
+        periods,
         year: int = datetime.now().year,
         month: int = datetime.now().month
     ) -> InlineKeyboardMarkup:
@@ -43,8 +46,11 @@ class SimpleCalendar(GenericCalendar):
             date_to_check = datetime(year, month, day)
             #берем даты из бд начала и конца периода
             #если конца нет то конечная дата это дата начала + длина периода
-            if date_to_check.date() >= datetime.strptime('15.03.2024', '%d.%m.%Y').date() and date_to_check.date() <= datetime.strptime('20.03.2024', '%d.%m.%Y').date():
-                return str(day) + '🌸'
+            global all_periods
+            all_periods = periods
+            for i in all_periods:
+                if date_to_check.date() >= datetime.strptime(i[0], '%Y-%m-%d').date() and date_to_check.date() <= datetime.strptime(i[1], '%Y-%m-%d').date():
+                    return str(day) + '🌸'
             """
             if self.min_date and date_to_check < self.min_date:
                 return superscript(str(day))
@@ -133,8 +139,9 @@ class SimpleCalendar(GenericCalendar):
         return InlineKeyboardMarkup(row_width=7, inline_keyboard=kb)
 
     async def _update_calendar(self, query: CallbackQuery, with_date: datetime):
+        global all_periods
         await query.message.edit_reply_markup(
-            reply_markup=await self.start_calendar(int(with_date.year), int(with_date.month))
+            reply_markup=await self.start_calendar(all_periods, int(with_date.year), int(with_date.month))
         )
 
     async def process_selection(self, query: CallbackQuery, data: SimpleCalendarCallback) -> tuple:
