@@ -96,8 +96,10 @@ async def start_date(user_id, start):  # добавление даты нача�
             user_id TEXT, 
             start_date TEXT, 
             end_date TEXT)""")
-    days_period_long = cur.execute("""SELECT period_length FROM users WHERE user_id = ?""", (user_id, )).fetchone()[0]
-    end = str(start + timedelta(days=days_period_long))
+    days = int(cur.execute("SELECT period_length "
+                       "FROM users "
+                       "WHERE user_id = ?", (user_id, )).fetchone()[0])
+    end = str(start + timedelta(days=days))
     #ending = datetime.strptime(end, "%Y.%m.%d")
     cur.execute("INSERT INTO cycles (user_id, start_date, end_date) VALUES (?, ?, ?)",
                 (user_id, f"{start}", f"{end}"))
@@ -160,9 +162,8 @@ async def cycle_info(user_id):
                                    "FROM cycles "
                                    "WHERE user_id = ?", (user_id,)).fetchone()
     last_cycle = datetime.strptime(cycles[len(cycles)-1], "%Y-%m-%d")
-    next_cycle = (last_cycle + timedelta(days=cycle_length)).date()
-    count_days = (next_cycle - curr_date).days
-    return next_cycle.strftime("%d.%m.%Y"), count_days
+    next_cycle = last_cycle + timedelta(days=cycle_length)
+    return next_cycle
     db.close()
 
 
@@ -176,11 +177,13 @@ async def fertile_days(user_id):
     cycles = cur.execute("SELECT start_date "
                                    "FROM cycles "
                                    "WHERE user_id = ?", (user_id,)).fetchone()
+    days = []
     number_day_start = cycle_length - 16
     number_day_end = cycle_length - 12
     start_days = datetime.strptime(cycles[len(cycles)-1], "%Y-%m-%d")
-    next_days_start = (start_days + timedelta(days=number_day_start)).date()
-    next_days_end = (start_days + timedelta(days=number_day_end)).date()
-    count_days = (next_days_start - curr_date).days
-    return next_days_start.strftime("%d.%m.%Y"), next_days_end.strftime("%d.%m.%Y"), count_days
+    next_days_start = start_days + timedelta(days=number_day_start)
+    next_days_end = start_days + timedelta(days=number_day_end)
+    days.append(next_days_start)
+    days.append(next_days_end)
+    return days
     db.close()
